@@ -27,21 +27,21 @@
 
 module sky130_ef_ip__adc3v_12bit #(parameter FUNCTIONAL = 1)(
 `ifdef USE_POWER_PINS
-   inout       vccd0,
-   inout       vssd0,
-   inout       vdda0,
-   inout       vssa0,
+   inout       vccd,
+   inout       vssd,
+   inout       vdda,
+   inout       vssa,
 `endif
    input  real  adc_trim,
    input  real  adc_vCM,
    input  real  adc_vrefL,
    input  real  adc_vrefH,
-   input  real  adc0,
-   input        adc0_ena,
-   input        adc0_reset,
-   input        adc0_hold,
-   input [11:0] adc0_dac_val_0,
-   output       adc0_comp_out
+   input  real  adc_in,
+   input        adc_ena,
+   input        adc_reset,
+   input        adc_hold,
+   input [11:0] adc_dac_val,
+   output       adc_comp_out
 );
 
 generate
@@ -58,18 +58,18 @@ generate
       initial begin
         held_value <= 0;
       end
-      always @(posedge adc0_hold)
-        held_value = adc0;
+      always @(posedge adc_hold)
+        held_value = adc_in;
 
       always @* begin
          if (ena == 1'b1) begin
-            dac_value <= adc_vrefL + adc0_dac_val_0 * (adc_vrefH - adc_vrefL) / 4069.0;
+            dac_value <= adc_vrefL + adc_dac_val * (adc_vrefH - adc_vrefL) / 4069.0;
          end else begin
             dac_value <= 0;
          end
       end
       
-      assign adc0_comp_out = (held_value > dac_out) ? 1'b1 : 1'b0;
+      assign adc_comp_out = (held_value > dac_out) ? 1'b1 : 1'b0;
    end
 endgenerate
 
