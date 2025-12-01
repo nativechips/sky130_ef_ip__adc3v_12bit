@@ -1,0 +1,50 @@
+module ADC_TOP (
+    inout AVPWR,
+    inout AVGND,
+    inout DVPWR,
+    inout DVGND,
+    input adc_in,
+    input ena_follower_amp,
+    input ena_adc,
+    input adc_reset,
+    input adc_hold,
+    input [11:0] adc_dac_val,
+    output adc_cmp
+);
+
+res_div res_div_inst (
+    .vdda  (AVPWR),
+    .vssa  (AVGND),
+    .vsub  (DVGND),
+    .vref  (adc_vref)
+);
+
+follower_amp follower_amp_inst (
+    .vdd  (AVPWR),
+    .vss  (AVGND),
+    .vsub (VSUB),
+    .in   (adc_vref),
+    .out  (adc_vref_buf),
+    .ena  (ena_follower_amp)
+);
+
+sky130_ef_ip__adc3v_12bit adc_inst (
+    .vccd  (DVPWR),
+    .vssd  (DVGND),
+    .vdda  (AVPWR),
+    .vssa  (AVGND),
+
+    .adc_trim   (AVGND),
+    .adc_vCM    (adc_vref_buf),
+    .adc_vrefL  (AVGND),
+    .adc_vrefH  (AVPWR),
+    .adc_in     (adc_in),
+
+    .adc_ena        (ena_adc),
+    .adc_reset      (adc_reset),
+    .adc_hold       (adc_hold),
+    .adc_dac_val    (adc_dac_val),
+    .adc_comp_out   (adc_cmp)
+);
+
+endmodule
